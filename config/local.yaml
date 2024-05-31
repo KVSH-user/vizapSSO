@@ -1,0 +1,12 @@
+env: "local"
+postgres:
+  host: "localhost" # адрес БД
+  port: 5432 # порт БД
+  user: "postgres" # юзер БД
+  password: "mysecretpassword" # пароль БД
+  db_name: "postgres" # имя БД
+access_token_ttl: 1h
+refresh_token_ttl: 720h #30days
+grpc:
+  port: 5001
+  timeout: 5s
