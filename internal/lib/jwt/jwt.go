@@ -3,6 +3,7 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"log"
 	"time"
 	"vizapSSO/internal/entity"
 )
@@ -16,6 +17,7 @@ func NewAccessToken(user entity.User, app entity.App, duration time.Duration) (a
 	claims["app_id"] = app.ID
 
 	accessToken, err = token.SignedString([]byte(app.Secret))
+	log.Println(app.Secret)
 	if err != nil {
 		return "", err
 	}

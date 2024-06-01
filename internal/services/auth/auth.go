@@ -186,11 +186,15 @@ func (a *Auth) RefreshSession(ctx context.Context, accessToken, refreshToken str
 	}
 
 	var user entity.User
-	var app entity.App
+	user.ID = uid
 
 	//TODO: исправить данную реализацию
-	app.ID = 1
-	user.ID = uid
+	app, err := a.appProvider.App(1)
+	if err != nil {
+		return "", "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info(app.Secret)
 
 	newAccessToken, err = jwt.NewAccessToken(user, app, a.accessTokenTTL)
 	if err != nil {
@@ -199,7 +203,7 @@ func (a *Auth) RefreshSession(ctx context.Context, accessToken, refreshToken str
 		return "", "", fmt.Errorf("%s: %w", op, err)
 	}
 
-	lastChar := accessToken[len(newAccessToken)-6:]
+	lastChar := newAccessToken[len(newAccessToken)-6:]
 
 	newRefreshToken, err = jwt.NewRefreshToken(lastChar, app, a.refreshTokenTTL)
 	if err != nil {
