@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -44,18 +45,25 @@ func main() {
 func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 
+	logFile, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		panic("failed to open log file: " + err.Error())
+	}
+
+	multiWriter := io.MultiWriter(os.Stdout, logFile)
+
 	switch env {
 	case envLocal:
 		log = slog.New(
-			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+			slog.NewTextHandler(multiWriter, &slog.HandlerOptions{Level: slog.LevelDebug}),
 		)
 	case envDev:
 		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
+			slog.NewJSONHandler(multiWriter, &slog.HandlerOptions{Level: slog.LevelDebug}),
 		)
 	case envProd:
 		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+			slog.NewJSONHandler(multiWriter, &slog.HandlerOptions{Level: slog.LevelInfo}),
 		)
 	}
 

@@ -1,6 +1,6 @@
 env: "local"
 postgres:
-  host: "localhost" # адрес БД
+  host: "postgres" # адрес БД, указанный в docker-compose.yml
   port: 5432 # порт БД
   user: "postgres" # юзер БД
   password: "mysecretpassword" # пароль БД

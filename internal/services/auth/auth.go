@@ -87,8 +87,8 @@ func (a *Auth) Login(ctx context.Context, phone, password string, appID int32,
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
-		a.log.Info("invalid credentials", err)
-		return "", "", fmt.Errorf("%s: %w", op, err)
+		a.log.Info("invalid credentials", ErrInvalidCredentials)
+		return "", "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
 	app, err := a.appProvider.App(appID)
