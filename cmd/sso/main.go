@@ -2,10 +2,12 @@ package main
 
 import (
 	"io"
+	stlog "log"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 	"vizapSSO/internal/app"
 	"vizapSSO/internal/config"
 )
@@ -21,14 +23,11 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	log.Info("starting SSO app",
-		slog.String("env", cfg.Env),
-		slog.Int("port", cfg.GRPC.Port),
-	)
-
 	application := app.New(log, cfg.GRPC.Port, cfg.AccessTokenTTL, cfg.RefreshTokenTTL, cfg.Postgres)
 
 	go application.GRPSServer.MustRun()
+
+	Print(cfg, log)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
@@ -68,4 +67,18 @@ func setupLogger(env string) *slog.Logger {
 	}
 
 	return log
+}
+
+func Print(cfg *config.Config, log *slog.Logger) {
+	time.Sleep(time.Second * 3)
+
+	stlog.Println("==========SSO APP STARTED===========")
+	stlog.Printf("|gRPC PORT................%d\n", cfg.GRPC.Port)
+	stlog.Printf("|POSTGRESQL HOST..........%s\n", cfg.Postgres.Host)
+	stlog.Printf("|POSTGRESQL PORT..........%d\n", cfg.Postgres.Port)
+	stlog.Printf("|ACCESS TOKEN TTL.........%s\n", cfg.AccessTokenTTL)
+	stlog.Printf("|REFRESH TOKEN TTL........%s\n", cfg.RefreshTokenTTL)
+	stlog.Printf("|ENV CONFIG...............%s\n", cfg.Env)
+	stlog.Println("====================================")
+
 }

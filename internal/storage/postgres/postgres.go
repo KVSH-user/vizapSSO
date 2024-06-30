@@ -89,14 +89,14 @@ func (s *Storage) SaveRefreshToken(refreshToken string, uid int64) error {
 	const op = "postgres.SaveRefreshToken"
 
 	secondQuery := `
-		INSERT INTO refresh_token (token, uid, is_active)
-		VALUES ($1, $2, true);
+		INSERT INTO refresh_token (token, user_id)
+		VALUES ($1, $2);
 		`
 
 	query := `
 		UPDATE refresh_token
 		SET is_active = false
-		WHERE uid = $1;
+		WHERE user_id = $1;
 		`
 
 	tx, err := s.db.Begin()
@@ -125,7 +125,7 @@ func (s *Storage) App(appID int32) (entity.App, error) {
 	query := `
 		SELECT apps.name,
 		apps.secret,
-		apps.ID
+		apps.id
 		FROM apps
 		WHERE id = $1
 		LIMIT 1;

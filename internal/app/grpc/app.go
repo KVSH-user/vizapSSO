@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net"
 	authgrpc "vizapSSO/internal/grpc/auth"
+	"vizapSSO/internal/interceptor"
 )
 
 type App struct {
@@ -15,7 +16,10 @@ type App struct {
 }
 
 func New(log *slog.Logger, authService authgrpc.Auth, GRPCPort int) *App {
-	gRPCServer := grpc.NewServer()
+	gRPCServer := grpc.NewServer(
+		grpc.UnaryInterceptor(interceptor.UnaryLoggingInterceptor(log)),
+		grpc.StreamInterceptor(interceptor.StreamLoggingInterceptor(log)),
+	)
 
 	authgrpc.Register(gRPCServer, authService)
 
